@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,6 +71,22 @@ public class BrandOwnerManageController {
             @RequestParam(required = false) String brandCode,
             @RequestParam(required = false) String ownerName) {
         return Result.ok(brandOwnerService.page(page, size, brandCode, ownerName));
+    }
+
+    /**
+     * 查询所有去重的品牌编码列表。
+     */
+    @GetMapping("/distinct-brand-codes")
+    public Result<List<String>> distinctBrandCodes() {
+        return Result.ok(brandOwnerService.listDistinctBrandCodes());
+    }
+
+    /**
+     * 查询所有去重的负责人名称列表。
+     */
+    @GetMapping("/distinct-owner-names")
+    public Result<List<String>> distinctOwnerNames() {
+        return Result.ok(brandOwnerService.listDistinctOwnerNames());
     }
 
     /**

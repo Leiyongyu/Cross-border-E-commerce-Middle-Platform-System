@@ -257,9 +257,23 @@ public class InventoryOverviewServiceImpl implements InventoryOverviewService {
 
                 item.setPurchasePendingDelivery(purchasePendingMap.getOrDefault(inv.siteLabel + "|" + baseSku, 0));
 
-                item.setOverseasInStockRatio(divide(item.getOverseasSellable(), 1));
-                item.setOverseasTotalRatio(divide(item.getOverseasTotal(), 1));
-                item.setTotalInventoryRatio(divide(item.getTotalInventory(), 1));
+                // 采购数量 = 近3月均销量 × (采购周期 + 出库天数)
+                Integer cycle = item.getPurchaseCycle(), od = item.getOutboundDays();
+                if (cycle != null && od != null) {
+                    BigDecimal avg = BigDecimal.valueOf(item.getLast90DaysSales()).divide(BigDecimal.valueOf(3), 4, RoundingMode.HALF_UP);
+                    item.setPurchaseQuantity(avg.multiply(BigDecimal.valueOf(cycle + od)));
+                }
+
+                // 最大月销预估补货量 = 历史最大月销 × 4.03 - 整个周期总库存
+                Integer mm = item.getMaxMonthlySales();
+                if (mm != null && mm > 0) {
+                    item.setMaxMonthlyReplenish((int) Math.max(0, Math.round(mm * 4.03 - item.getTotalInventory())));
+                }
+
+                int d30 = item.getLast30DaysSales();
+                item.setOverseasInStockRatio(divide(item.getOverseasSellable(), d30));
+                item.setOverseasTotalRatio(divide(item.getOverseasTotal(), d30));
+                item.setTotalInventoryRatio(divide(item.getTotalInventory(), d30));
                 item.setOwner(matchOwner(baseSku, ownerByBrand));
                 result.add(item);
             }

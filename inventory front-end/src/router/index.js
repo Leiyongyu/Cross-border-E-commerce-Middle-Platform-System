@@ -35,6 +35,12 @@ const router = createRouter({
           name: 'purchasePlanCreate',
           component: () => import('@/views/PurchasePlanCreateView.vue'),
         },
+        {
+          path: 'brand-owners',
+          name: 'brandOwners',
+          component: () => import('@/views/BrandOwnerView.vue'),
+          meta: { requiresAdmin: true },
+        },
       ],
     },
   ],

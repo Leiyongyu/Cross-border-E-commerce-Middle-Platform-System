@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 品牌归属业务实现，含 brandCode 唯一性校验和 Entity→Response 转换。
@@ -126,6 +127,26 @@ public class BrandOwnerServiceImpl extends ServiceImpl<BrandOwnerMapper, BrandOw
             responses.add(toResponse(r));
         }
         return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), responses);
+    }
+
+    @Override
+    public List<String> listDistinctBrandCodes() {
+        return list().stream()
+                .map(BrandOwnerEntity::getBrandCode)
+                .filter(StringUtils::hasText)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> listDistinctOwnerNames() {
+        return list().stream()
+                .map(BrandOwnerEntity::getOwnerName)
+                .filter(StringUtils::hasText)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     /** 将 Entity 转换为前端展示用的 Response 对象。 */

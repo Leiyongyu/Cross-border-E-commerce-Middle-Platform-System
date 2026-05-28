@@ -39,6 +39,16 @@ export async function fetchBrandsByOwner(ownerName) {
   return result?.records || []
 }
 
+/** 查询所有去重的品牌编码 */
+export function fetchDistinctBrandCodes() {
+  return apiGet('/api/brand-owners/distinct-brand-codes')
+}
+
+/** 查询所有去重的负责人名称 */
+export function fetchDistinctOwnerNames() {
+  return apiGet('/api/brand-owners/distinct-owner-names')
+}
+
 /** 删除品牌归属 */
 export function deleteBrandOwner(id) {
   return apiDelete(`/api/brand-owners/${id}`)

@@ -16,12 +16,27 @@ import {
   useMessage,
 } from 'naive-ui'
 import { createUser, deleteUser, fetchUsersPage, updateUser } from '@/api/users'
-import { createBrandOwner, deleteBrandOwner, fetchBrandOwnerByBrandCode, fetchBrandsByOwner, updateBrandOwner } from '@/api/brandOwners'
+import { createBrandOwner, deleteBrandOwner, fetchBrandOwnerByBrandCode, fetchBrandsByOwner, fetchDistinctBrandCodes, fetchDistinctOwnerNames, updateBrandOwner } from '@/api/brandOwners'
 
 const message = useMessage()
 const dialog = useDialog()
 
 const loading = ref(false)
+const brandCodeOptions = ref([])
+const ownerNameOptions = ref([])
+
+async function loadFormOptions() {
+  try {
+    const [brandCodes, ownerNames] = await Promise.all([
+      fetchDistinctBrandCodes(),
+      fetchDistinctOwnerNames(),
+    ])
+    brandCodeOptions.value = (brandCodes || []).map((v) => ({ label: v, value: v }))
+    ownerNameOptions.value = (ownerNames || []).map((v) => ({ label: v, value: v }))
+  } catch {
+    // 静默失败，允许手动输入
+  }
+}
 const users = ref([])
 const total = ref(0)
 
@@ -150,13 +165,14 @@ function handleSearch() {
   loadUsers()
 }
 
-function openCreateModal() {
+async function openCreateModal() {
   createForm.account = ''
   createForm.password = ''
   createForm.role = 'user'
   createForm.brandCode = ''
   createForm.ownerName = ''
   showCreateModal.value = true
+  if (brandCodeOptions.value.length === 0) await loadFormOptions()
 }
 
 async function submitCreate() {
@@ -204,6 +220,8 @@ async function openEditModal(row) {
   editForm.role = normalizeRole(row.role)
   editForm.ownerName = row.ownerName || ''
   editForm.originalOwnerName = row.ownerName || ''
+
+  if (brandCodeOptions.value.length === 0) await loadFormOptions()
 
   // 加载该负责人当前管理的品牌
   const brands = await fetchBrandsByOwner(row.ownerName)
@@ -482,10 +500,24 @@ onMounted(() => {
           <NSelect v-model:value="createForm.role" :options="roleOptions" />
         </NFormItem>
         <NFormItem label="品牌编码">
-          <NInput v-model:value="createForm.brandCode" placeholder="例如：BR001A" />
+          <NSelect
+            v-model:value="createForm.brandCode"
+            :options="brandCodeOptions"
+            filterable
+            clearable
+            tag
+            placeholder="选择或输入品牌编码"
+          />
         </NFormItem>
         <NFormItem label="负责人">
-          <NInput v-model:value="createForm.ownerName" placeholder="例如：张三" />
+          <NSelect
+            v-model:value="createForm.ownerName"
+            :options="ownerNameOptions"
+            filterable
+            clearable
+            tag
+            placeholder="选择或输入负责人"
+          />
         </NFormItem>
       </NForm>
 
@@ -514,9 +546,13 @@ onMounted(() => {
           <NSelect v-model:value="editForm.role" :options="roleOptions" />
         </NFormItem>
         <NFormItem label="负责人">
-          <NInput
+          <NSelect
             v-model:value="editForm.ownerName"
-            placeholder="负责人姓名"
+            :options="ownerNameOptions"
+            filterable
+            clearable
+            tag
+            placeholder="选择或输入负责人"
           />
         </NFormItem>
         <NFormItem label="管理品牌">

@@ -16,10 +16,10 @@ import {
 import { fetchInventoryOverview, fetchInventoryOverviewWarehouses } from '@/api/inventoryOverview'
 import { syncAll } from '@/api/sync'
 import { uploadEbaySales } from '@/api/ebaySales'
-import { useRouter } from 'vue-router'
+
 
 const message = useMessage()
-const router = useRouter()
+
 
 const loading = ref(false)
 const syncing = ref(false)
@@ -448,8 +448,8 @@ function renderWarehouseOption({ node, option, selected }) {
 </script>
 
 <template>
-  <section class="json-workspace">
-    <NCard title="补货" size="large">
+  <section class="dashboard-page">
+    <NCard title="补货" size="large" class="dashboard-card">
       <template #header-extra>
         <NSpace align="center" size="small">
           <NTag type="info" :bordered="false">更新时间 {{ updatedAt || '-' }}</NTag>
@@ -463,9 +463,7 @@ function renderWarehouseOption({ node, option, selected }) {
           <NButton size="small" type="info" :loading="syncing" @click="handleUploadExcel">
             上传销量报表
           </NButton>
-          <NButton size="small" type="success" @click="router.push({ name: 'purchasePlanCreate' })">
-            创建采购计划
-          </NButton>
+
         </NSpace>
       </template>
 

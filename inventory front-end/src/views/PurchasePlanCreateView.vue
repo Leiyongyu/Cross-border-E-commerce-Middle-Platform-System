@@ -1,6 +1,6 @@
 <script setup>
 import { h, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+
 import {
   NButton,
   NCard,
@@ -17,7 +17,7 @@ import {
 import { createPurchasePlan, searchSkus, searchStores, searchWarehouses } from '@/api/purchasePlan'
 import { useAuthStore } from '@/stores/auth'
 
-const router = useRouter()
+
 const message = useMessage()
 const auth = useAuthStore()
 
@@ -174,16 +174,18 @@ const columns = [
   {
     title: 'SKU',
     key: 'sku',
+    width: 160,
     render: (row) =>
       h(NSelect, {
         value: row.sku,
         size: 'small',
         clearable: true,
         filterable: true,
+        consistentMenuWidth: false,
         options: skuOptions.value,
         loading: skuLoading.value,
         placeholder: '搜索SKU',
-        style: { width: '100%', minWidth: 0 },
+        style: { width: '100%' },
         onSearch: onSkuSearch,
         'onUpdate:value': (val) => {
           row.sku = val || ''
@@ -193,16 +195,18 @@ const columns = [
   {
     title: '店铺',
     key: 'sid',
+    width: 160,
     render: (row) =>
       h(NSelect, {
         value: row.sid,
         size: 'small',
         clearable: true,
         filterable: true,
+        consistentMenuWidth: false,
         options: storeOptions.value,
         loading: storeLoading.value,
         placeholder: '搜索店铺',
-        style: { width: '100%', minWidth: 0 },
+        style: { width: '100%' },
         onSearch: onStoreSearch,
         'onUpdate:value': (val) => {
           row.sid = val || ''
@@ -241,16 +245,18 @@ const columns = [
   {
     title: '仓库',
     key: 'wid',
+    width: 150,
     render: (row) =>
       h(NSelect, {
         value: row.wid,
         size: 'small',
         clearable: true,
         filterable: true,
+        consistentMenuWidth: false,
         options: warehouseOptions.value,
         loading: warehouseLoading.value,
         placeholder: '搜索仓库',
-        style: { width: '100%', minWidth: 0 },
+        style: { width: '100%' },
         onSearch: onWarehouseSearch,
         'onUpdate:value': (val) => {
           row.wid = val ?? null
@@ -395,11 +401,11 @@ const columns = [
 </script>
 
 <template>
-  <section class="json-workspace purchase-plan-workspace">
-    <NCard title="创建采购计划" size="large">
+  <section class="dashboard-page">
+    <NCard title="创建采购计划" size="large" class="dashboard-card">
       <template #header-extra>
         <NSpace>
-          <NButton size="small" @click="router.push({ name: 'dashboard' })">返回看板</NButton>
+
           <NButton type="success" size="small" :loading="submitting" @click="submitAll">
             提交 ({{ items.filter((row) => !isRowEmpty(row)).length }}条)
           </NButton>
@@ -421,19 +427,12 @@ const columns = [
 <style scoped src="../assets/styles/dashboard-view.css"></style>
 
 <style scoped>
-.purchase-plan-workspace {
-  padding: 16px;
-  width: 100%;
-  min-width: 0;
-}
-
 .purchase-plan-table :deep(.n-data-table-td),
 .purchase-plan-table :deep(.n-data-table-th) {
   padding: 8px 10px;
 }
 
 .purchase-plan-table :deep(.n-data-table-table) {
-  table-layout: fixed;
 }
 
 .purchase-plan-table :deep(.n-data-table-th__title) {
